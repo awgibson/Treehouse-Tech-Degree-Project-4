@@ -30,23 +30,143 @@ class Board {
           <li class="box"></li>
         </ul>
         </div>`;
+
+
     }
     loadGame(visible) {
-        body[0].insertAdjacentHTML('beforeend', this._boardHTML);
+        body[0].innerHTML = this._boardHTML;
         const start = document.getElementById('start');
         const player1 = document.getElementById('player1');
+        const boardSpaces = document.querySelectorAll('.box');
         player1.classList.add('active');
-        start.style.display = 'none';
+
+        for (let i = 0; i < boardSpaces.length; i++) {
+            boardSpaces[i].id = i;
+        }
+    }
+
+    updateBoard(event, player) {
+        const space = event.target.id;
+        if (space <= 2) {
+            this._board[0][space] = player._letter;
+            this.checkWin(player);
+        } else if (space >= 3 && space <= 5) {
+            this._board[1][space - 3] = player._letter;
+            this.checkWin(player);
+        } else if (space >= 6 && space <= 8) {
+            this._board[2][space - 6] = player._letter;
+            this.checkWin(player);
+        }
+
+
+    }
+
+    winScreen(player, isTie = false) {
+        const win = `<div class="screen screen-win" id="finish">
+        <header>
+          <h1>Tic Tac Toe</h1>
+          <p class="message"></p>
+          <a href="#" class="button">New game</a>
+        </header>
+      </div>`;
+
+        body[0].innerHTML = win;
+        const winScreen = document.getElementById('finish');
+        const message = document.getElementsByClassName('message');
+
+        if (player._isWinner === true) {
+            winScreen.classList.add(player._winClass);
+            message[0].innerText = 'Winner!';
+        } else {
+            winScreen.classList.add('screen-win-tie');
+            message[0].innerText = 'Tie!';
+        }
+
+    }
+
+    checkWin(player) {
+        for (let i = 0; i < 3; i++) {
+            //check horizontal wins
+            if (player._letter === this._board[i][0] &&
+                player._letter === this._board[i][1] &&
+                player._letter === this._board[i][2]) {
+                player._isWinner = true;
+            }
+            // //check vertical wins
+            if (player._letter === this._board[0][i] &&
+                player._letter === this._board[1][i] &&
+                player._letter === this._board[2][i]) {
+                player._isWinner = true;
+            }
+        }
+
+        //check wins on the diagonal
+        if (player._letter === this._board[0][0] &&
+            player._letter === this._board[1][1] &&
+            player._letter === this._board[2][2]) {
+            player._isWinner = true;
+        }
+
+        if (player._letter === this._board[0][2] &&
+            player._letter === this._board[1][1] &&
+            player._letter === this._board[2][0]) {
+            player._isWinner = true;
+        }
+
+        if (player._isWinner) {
+            this.winScreen(player);
+        } else if (this._board.toString().length === 17) {
+            this.winScreen(player);
+        }
+
+    }
+
+    hoverOn(event, currentPlayer) {
+        if (currentPlayer === 'player1') {
+            event.target.style.backgroundImage = player1.img;
+        } else if (currentPlayer === 'player2') {
+            event.target.style.backgroundImage = player2.img;
+        } else {
+            return false;
+        }
+    }
+
+    hoverOut(event, currentPlayer) {
+        if (currentPlayer === 'player1') {
+            event.target.style.backgroundImage = '';
+        } else if (currentPlayer === 'player2') {
+            event.target.style.backgroundImage = '';
+        } else {
+            return false;
+        }
     }
 
 }
 
 class Player {
-    constructor(player, isTurn = false, isComputer = false) {
+    constructor(player, isComputer = false) {
         this._player = player;
-        this._isTurn = isTurn;
         this._isComputer = isComputer;
         this._playerActiveGraphic = document.getElementById(this._player);
+        this._isWinner = false;
+
+        if (this._player === 'player1') {
+            this._isTurn = true;
+            this._img = `url('img/o.svg')`;
+            this._letter = 'o';
+            this._playClass = 'box-filled-1';
+            this._winClass = 'screen-win-one';
+        } else {
+            this._isTurn = false;
+            this._img = `url('img/x.svg')`;
+            this._letter = 'x';
+            this._playClass = 'box-filled-2';
+            this._winClass = 'screen-win-two';
+        }
+    }
+
+    get img() {
+        return this._img;
     }
 
     set turn(isTurn) {
@@ -59,59 +179,23 @@ class Player {
         }
     }
 
+
     move(event) {
-        if (this._player === 'player1' && this._isTurn === true) {
-            event.target.classList.add('box-filled-1');
-            event.target.classList.add('taken');
-            this.turn = false;
+        event.target.classList.add(this._playClass);
+        event.target.classList.add('taken');
+        board.updateBoard(event, this);
+        this.turn = false;
+        if (this._player === 'player1') {
             player2.turn = true;
-        } else if (this._player === 'player2' && this._isTurn === true) {
-            event.target.classList.add('box-filled-2');
-            event.target.classList.add('taken');
-            this.turn = false;
+        } else if (this._player === 'player2') {
             player1.turn = true;
         } else {
             return false;
         }
     }
 
-    hoverOn(event) {
-        if (this._player === 'player1' && this._isTurn === true) {
-            event.target.style.backgroundImage = `url('img/o.svg')`;
-        } else if (this._player === 'player2' && this._isTurn === true) {
-            event.target.style.backgroundImage = `url('img/x.svg')`;
-        } else {
-            return false;
-        }
-    }
-
-    hoverOut(event) {
-        if (this._player === 'player1' && this._isTurn === true) {
-            event.target.style.backgroundImage = '';
-        } else if (this._player === 'player2' && this._isTurn === true && event.target.classList.contains('taken') === false) {
-            event.target.style.backgroundImage = '';
-        } else {
-            return false;
-        }
-    }
-
-
 }
 
-function insertGameElements(element) {
-
-    const win = `<div class="screen screen-win" id="finish">
-<header>
-  <h1>Tic Tac Toe</h1>
-  <p class="message"></p>
-  <a href="#" class="button">New game</a>
-</header>
-</div>`;
-
-    // body[0].insertAdjacentHTML('beforeend', board);
-    // body[0].insertAdjacentHTML('beforeend', win);
-
-}
 
 window.addEventListener('load', () => {
     const start = `<div class="screen screen-start" id="start">
@@ -128,7 +212,7 @@ document.addEventListener('mousedown', (event) => {
         board = new Board();
         board.loadGame();
         player2 = new Player('player2');
-        player1 = new Player('player1', true);
+        player1 = new Player('player1');
 
     } else if (event.target.className === 'box' && event.target.classList.contains('taken') === false) {
         const currentPlayer = document.querySelector('.active').id;
@@ -144,11 +228,7 @@ document.addEventListener('mousedown', (event) => {
 document.addEventListener('mouseover', (event) => {
     if (event.target.classList.contains('box') && event.target.classList.contains('taken') === false && event.target.tagName === 'LI') {
         const currentPlayer = document.querySelector('.active').id;
-        if (currentPlayer === 'player1') {
-            player1.hoverOn(event);
-        } else if (currentPlayer === 'player2') {
-            player2.hoverOn(event);
-        }
+        board.hoverOn(event, currentPlayer);
     }
 });
 
@@ -157,12 +237,7 @@ document.addEventListener('mouseout', (event) => {
     if (event.target.classList.contains('box') && event.target.tagName === 'LI' && event.target.classList.contains('taken') === false) {
         console.log('mouse out!');
         const currentPlayer = document.querySelector('.active').id;
-        if (currentPlayer === 'player1') {
-            player1.hoverOut(event);
-        } else if (currentPlayer === 'player2') {
-            player2.hoverOut(event);
-        }
-
+        board.hoverOut(event, currentPlayer);
     }
 });
 
