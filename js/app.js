@@ -62,7 +62,7 @@
 
         }
 
-        winScreen(player, isTie = false) {
+        winScreen(player) {
             const win = `<div class="screen screen-win" id="finish">
         <header>
           <h1>Tic Tac Toe</h1>
@@ -202,6 +202,11 @@
         const start = `<div class="screen screen-start" id="start">
     <header>
       <h1>Tic Tac Toe</h1>
+      <label for="player1-name">Player 1 Name:</label>
+        <input type="text" id="player1-name"><br />
+
+    <label for="player2-name">Player 2 Name:</label>
+        <input type="text" id="player2-name"><br />
       <a href="#" class="button">Start game</a>
     </header>
     </div>`;
