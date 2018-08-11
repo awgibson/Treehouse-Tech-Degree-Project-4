@@ -34,13 +34,18 @@
 
 
         }
-        loadGame(visible) {
+        loadGame(p1Name, p2Name) {
             body[0].innerHTML = this._boardHTML;
-            const start = document.getElementById('start');
-            const player1 = document.getElementById('player1');
+            const player1Highlight = document.getElementById('player1');
+            const player2Highlight = document.getElementById('player2');
             const boardSpaces = document.querySelectorAll('.box');
-            player1.classList.add('active');
-
+            player1Highlight.classList.add('active');
+            if (p1Name.length > 0) {
+                player1Highlight.innerText = p1Name;
+            }
+            if (p2Name.length > 0) {
+                player2Highlight.innerText = p2Name;
+            }
             for (let i = 0; i < boardSpaces.length; i++) {
                 boardSpaces[i].id = i;
             }
@@ -75,9 +80,12 @@
             const winScreen = document.getElementById('finish');
             const message = document.getElementsByClassName('message');
 
-            if (player._isWinner === true) {
+            if (player._isWinner === true && player._name === '') {
                 winScreen.classList.add(player._winClass);
                 message[0].innerText = 'Winner!';
+            } else if (player._isWinner === true && player._name !== player._player) {
+                winScreen.classList.add(player._winClass);
+                message[0].innerText = `${player._name} Wins!`;
             } else {
                 winScreen.classList.add('screen-win-tie');
                 message[0].innerText = 'Tie!';
@@ -145,8 +153,9 @@
     }
 
     class Player {
-        constructor(player, isComputer = false) {
+        constructor(player, name, isComputer = false) {
             this._player = player;
+            this._name = name;
             this._isComputer = isComputer;
             this._playerActiveGraphic = document.getElementById(this._player);
             this._isWinner = false;
@@ -202,11 +211,13 @@
         const start = `<div class="screen screen-start" id="start">
     <header>
       <h1>Tic Tac Toe</h1>
+      <div class="player-inputs">
       <label for="player1-name">Player 1 Name:</label>
-        <input type="text" id="player1-name"><br />
+        <input type="text" id="player1-name" maxlength="16"><br />
 
     <label for="player2-name">Player 2 Name:</label>
-        <input type="text" id="player2-name"><br />
+        <input type="text" id="player2-name" maxlength="16"><br />
+        </div>
       <a href="#" class="button">Start game</a>
     </header>
     </div>`;
@@ -215,10 +226,20 @@
 
     document.addEventListener('mousedown', (event) => {
         if (event.target.className === 'button') {
+            let p1Name;
+            let p2Name;
+            if (document.querySelectorAll('INPUT').length === 2) {
+                p1Name = document.querySelector('#player1-name').value;
+                p2Name = document.querySelector('#player2-name').value;
+            } else {
+                p1Name = player1._name;
+                p2Name = player2._name;
+            }
             board = new Board();
-            board.loadGame();
-            player2 = new Player('player2');
-            player1 = new Player('player1');
+            board.loadGame(p1Name, p2Name);
+            player2 = new Player('player2', p2Name);
+            player1 = new Player('player1', p1Name);
+
 
         } else if (event.target.className === 'box' && event.target.classList.contains('taken') === false) {
             const currentPlayer = document.querySelector('.active').id;
