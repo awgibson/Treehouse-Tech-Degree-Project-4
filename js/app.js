@@ -224,7 +224,7 @@
         body[0].innerHTML = start;
     });
 
-    document.addEventListener('mousedown', (event) => {
+    document.addEventListener('click', (event) => {
         if (event.target.className === 'button') {
             let p1Name;
             let p2Name;
