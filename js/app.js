@@ -55,19 +55,23 @@
             const space = event.target.id;
             if (space <= 2) {
                 this._board[0][space] = player._letter;
-                this.checkWin(player);
             } else if (space >= 3 && space <= 5) {
                 this._board[1][space - 3] = player._letter;
-                this.checkWin(player);
             } else if (space >= 6 && space <= 8) {
                 this._board[2][space - 6] = player._letter;
-                this.checkWin(player);
             }
 
+            if (this.checkWin(player) && (this.checkWin(player) !== 'tie')) {
+
+                player._isWinner = true;
+                this.winScreen(player);
+            } else if (this.checkWin(player) === 'tie') {
+                this.winScreen(player, 'tie');
+            }
 
         }
 
-        winScreen(player) {
+        winScreen(player, tie) {
             const win = `<div class="screen screen-win" id="finish">
         <header>
           <h1>Tic Tac Toe</h1>
@@ -80,15 +84,16 @@
             const winScreen = document.getElementById('finish');
             const message = document.getElementsByClassName('message');
 
-            if (player._isWinner === true && player._name === '') {
+            if (tie === 'tie') {
+                winScreen.classList.add('screen-win-tie');
+                message[0].innerText = 'Tie!';
+            }
+            else if (player._isWinner === true && player._name === '') {
                 winScreen.classList.add(player._winClass);
                 message[0].innerText = 'Winner!';
             } else if (player._isWinner === true && player._name !== player._player) {
                 winScreen.classList.add(player._winClass);
                 message[0].innerText = `${player._name} Wins!`;
-            } else {
-                winScreen.classList.add('screen-win-tie');
-                message[0].innerText = 'Tie!';
             }
 
         }
@@ -99,13 +104,13 @@
                 if (player._letter === this._board[i][0] &&
                     player._letter === this._board[i][1] &&
                     player._letter === this._board[i][2]) {
-                    player._isWinner = true;
+                    return true;
                 }
                 // //check vertical wins
                 if (player._letter === this._board[0][i] &&
                     player._letter === this._board[1][i] &&
                     player._letter === this._board[2][i]) {
-                    player._isWinner = true;
+                    return true;
                 }
             }
 
@@ -113,19 +118,17 @@
             if (player._letter === this._board[0][0] &&
                 player._letter === this._board[1][1] &&
                 player._letter === this._board[2][2]) {
-                player._isWinner = true;
+                return true;
             }
 
             if (player._letter === this._board[0][2] &&
                 player._letter === this._board[1][1] &&
                 player._letter === this._board[2][0]) {
-                player._isWinner = true;
+                return true;
             }
 
-            if (player._isWinner) {
-                this.winScreen(player);
-            } else if (this._board.toString().length === 17) {
-                this.winScreen(player);
+            if (this._board.toString().length === 17) {
+                return 'tie';
             }
 
         }
