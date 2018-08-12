@@ -17,10 +17,15 @@ h1 {
 
  input {
   display: block;
-  margin: 0 auto;
+  margin: .5em auto;
+  }
+
+
+  input[type ='checkbox']{
+    display: inline-block;
   }
 .player-inputs {
-  margin-top: 1.5em;
+  margin: 1.5em auto;
 }
 .button {
   background: #fff;

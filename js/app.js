@@ -156,10 +156,9 @@
     }
 
     class Player {
-        constructor(player, name, isComputer = false) {
+        constructor(player, name) {
             this._player = player;
             this._name = name;
-            this._isComputer = isComputer;
             this._playerActiveGraphic = document.getElementById(this._player);
             this._isWinner = false;
 
@@ -175,6 +174,11 @@
                 this._letter = 'x';
                 this._playClass = 'box-filled-2';
                 this._winClass = 'screen-win-two';
+            }
+
+            if (this._name === 'Computer') {
+                this._isComputer = true;
+                console.log(this._player + ' ' + this._name + ' is ' + this._isComputer);
             }
         }
 
@@ -219,7 +223,9 @@
         <input type="text" id="player1-name" maxlength="16"><br />
 
     <label for="player2-name">Player 2 Name:</label>
-        <input type="text" id="player2-name" maxlength="16"><br />
+        <input type="text" id="player2-name" maxlength="16">
+        <input type="checkbox" id="cpu-player">
+        <label for="cpu-player">Make Player 2 CPU Player</label>
         </div>
       <a href="#" class="button">Start game</a>
     </header>
@@ -231,7 +237,7 @@
         if (event.target.className === 'button') {
             let p1Name;
             let p2Name;
-            if (document.querySelectorAll('INPUT').length === 2) {
+            if (document.querySelectorAll('INPUT').length > 0) {
                 p1Name = document.querySelector('#player1-name').value;
                 p2Name = document.querySelector('#player2-name').value;
             } else {
@@ -263,11 +269,24 @@
     });
 
     document.addEventListener('mouseout', (event) => {
-
         if (event.target.classList.contains('box') && event.target.tagName === 'LI' && event.target.classList.contains('taken') === false) {
             console.log('mouse out!');
             const currentPlayer = document.querySelector('.active').id;
             board.hoverOut(event, currentPlayer);
+        }
+    });
+
+    document.addEventListener('change', (event) => {
+        if (event.target.id === 'cpu-player') {
+            const player2 = document.querySelector('#player2-name');
+            if (event.target.checked) {
+
+                player2.disabled = true;
+                player2.value = 'Computer';
+            } else {
+                player2.value = '';
+                player2.disabled = false;
+            }
         }
     });
 
