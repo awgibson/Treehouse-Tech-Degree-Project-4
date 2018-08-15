@@ -7,9 +7,9 @@
     class Board {
         constructor() {
             this._board = [
-                [],
-                [],
-                []
+                ['', '', ''],
+                ['', '', ''],
+                ['', '', '']
             ];
             this._boardHTML = `<div class="board" id="board">
         <header>
@@ -48,6 +48,7 @@
             }
             for (let i = 0; i < boardSpaces.length; i++) {
                 boardSpaces[i].id = i;
+                boardSpaces[i].classList.add('free');
             }
         }
 
@@ -198,10 +199,12 @@
 
 
         move(event) {
+            event.target.classList.remove('free');
             event.target.classList.add(this._playClass);
             event.target.classList.add('taken');
             board.updateBoard(event, this);
             this.turn = false;
+
             if (this._player === 'player1') {
                 player2.turn = true;
             } else if (this._player === 'player2') {
@@ -209,7 +212,26 @@
             } else {
                 return false;
             }
+
+            this.computerMove();
+
         }
+
+        computerMove() {
+            if (player2._isComputer) {
+                // const emptySpaces = document.getElementsByClassName('free');
+                // // console.log(emptySpaces);
+                // const move = Math.floor(Math.random() * emptySpaces.length);
+                // // console.log(move);
+
+                // document.getElementsByClassName('free')[move].click();
+
+                player1.turn = true;
+                player2.turn = false;
+            }
+        }
+
+
 
     }
 
@@ -250,11 +272,10 @@
             player1 = new Player('player1', p1Name);
 
 
-        } else if (event.target.className === 'box' && event.target.classList.contains('taken') === false) {
-            const currentPlayer = document.querySelector('.active').id;
-            if (currentPlayer === 'player1') {
+        } else if (event.target.classList.contains('box') && event.target.classList.contains('taken') === false) {
+            if (player1._isTurn) {
                 player1.move(event);
-            } else if (currentPlayer === 'player2') {
+            } else if (player2._isTurn) {
                 player2.move(event);
             }
         }
