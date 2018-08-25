@@ -179,7 +179,6 @@
 
             if (this._name === 'Computer') {
                 this._isComputer = true;
-                console.log(this._player + ' ' + this._name + ' is ' + this._isComputer);
             }
         }
 
@@ -212,29 +211,18 @@
             } else {
                 return false;
             }
-
-            this.computerMove();
-
-        }
-
-        computerMove() {
-            if (player2._isComputer) {
-                // const emptySpaces = document.getElementsByClassName('free');
-                // // console.log(emptySpaces);
-                // const move = Math.floor(Math.random() * emptySpaces.length);
-                // // console.log(move);
-
-                // document.getElementsByClassName('free')[move].click();
-
-                player1.turn = true;
-                player2.turn = false;
+            if (this._player === 'player1' && player2._isComputer && !player1._isWinner && !player2._isWinner) {
+                player2.computerMove();
             }
         }
 
+        computerMove() {
+            const emptySpaces = document.getElementsByClassName('free');
+            const move = Math.floor(Math.random() * emptySpaces.length);
 
-
+            document.getElementsByClassName('free')[move].click();
+        }
     }
-
 
     window.addEventListener('load', () => {
         const start = `<div class="screen screen-start" id="start">
@@ -291,7 +279,6 @@
 
     document.addEventListener('mouseout', (event) => {
         if (event.target.classList.contains('box') && event.target.tagName === 'LI' && event.target.classList.contains('taken') === false) {
-            console.log('mouse out!');
             const currentPlayer = document.querySelector('.active').id;
             board.hoverOut(event, currentPlayer);
         }
